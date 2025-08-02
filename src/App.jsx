@@ -84,7 +84,7 @@ const App = () => {
       const updatedItems = [...prevItems];
       const item = updatedItems[index];
 
-      // Defensive coding
+      // if targeted item is not being found
       if (!item) return prevItems;
 
       updatedItems[index] = {
