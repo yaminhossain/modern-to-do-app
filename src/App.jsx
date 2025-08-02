@@ -29,7 +29,7 @@ const taskOptions = [
 
 const App = () => {
   const [displayItems, setDisplayItems] = useState([]);
-  console.log(displayItems);
+  console.log("Display items", displayItems);
 
   //shadCN UI states
   const [isOpen, setIsOpen] = useState(false); //controls dropdown opening and closing state
@@ -43,6 +43,7 @@ const App = () => {
   //input field values
   const [inputFieldValue, setInputFieldValue] = useState("");
 
+  //set the active tags into an array
   const activeTagHandler = (tagName) => {
     const isTagNameExists = activeTags.find((t) => tagName === t);
     if (!isTagNameExists) {
@@ -53,10 +54,12 @@ const App = () => {
     }
   };
 
+  //getting the value from input field
   const inputValueHandle = (e) => {
     setInputFieldValue(e.target.value);
   };
 
+  //adding task items which will be displayed
   const addTaskToMenu = () => {
     const displayValues = { inputFieldValue, activeTags, selectedTaskType };
     if ((inputFieldValue, activeTags, selectedTaskType)) {
@@ -65,6 +68,37 @@ const App = () => {
       setActiveTags([]);
       setSelectedTaskType("");
     }
+  };
+
+  // handling drag over
+  const handleDragOver = (event) => {
+    event.preventDefault();
+  };
+
+  // handling drop
+  const handleDrop = (e, newTaskType) => {
+    // e.preventDefault();
+    const index = parseInt(e.dataTransfer.getData("text/plain"), 10);
+
+    setDisplayItems((prevItems) => {
+      const updatedItems = [...prevItems];
+      const item = updatedItems[index];
+
+      // Defensive coding
+      if (!item) return prevItems;
+
+      updatedItems[index] = {
+        ...item,
+        selectedTaskType: newTaskType,
+      };
+
+      return updatedItems;
+    });
+  };
+
+  //handling drag start
+  const handleDragStart = ({ e, index }) => {
+    e.dataTransfer.setData("text/plain", index);
   };
 
   return (
@@ -126,14 +160,33 @@ const App = () => {
       {/* Displaying Items to the UI */}
       <div className="grid grid-cols-3 gap-4 w-5xl mx-auto">
         {/* To Do Section */}
-        <div>
+        <div onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, "To Do")}>
           <h1 className="text-3xl font-bold">🎯To do</h1>
           {displayItems.map(
             (singleItem, index) =>
               singleItem.selectedTaskType === "To Do" && (
-                <Card className="w-full max-w-sm mt-4" key={index}>
+                <Card
+                  className="w-full max-w-sm mt-4 cursor-grab"
+                  key={index}
+                  draggable
+                  onDragStart={(e) => handleDragStart({ e, index })}
+                >
                   <CardContent>
                     <h2 className="text-xl">{singleItem?.inputFieldValue}</h2>
+                    {singleItem.activeTags.map((tag) => {
+                      const tagObj = tags.find((t) => t.tagName === tag);
+                      return (
+                        <Badge
+                          key={tag}
+                          variant="secondary"
+                          className={`me-2 ${
+                            tagObj ? tagObj.backgroundColor : ""
+                          }`}
+                        >
+                          {tag}
+                        </Badge>
+                      );
+                    })}
                   </CardContent>
                 </Card>
               )
@@ -141,14 +194,33 @@ const App = () => {
         </div>
 
         {/* Doing section */}
-        <div>
+        <div onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, "Doing")}>
           <h1 className="text-3xl font-bold">🌟Doing</h1>
           {displayItems.map(
             (singleItem, index) =>
               singleItem.selectedTaskType === "Doing" && (
-                <Card className="w-full max-w-sm mt-4" key={index}>
+                <Card
+                  className="w-full max-w-sm mt-4 cursor-grab"
+                  key={index}
+                  draggable
+                  onDragStart={(e) => handleDragStart({ e, index })}
+                >
                   <CardContent>
                     <h2 className="text-xl">{singleItem?.inputFieldValue}</h2>
+                    {singleItem.activeTags.map((tag) => {
+                      const tagObj = tags.find((t) => t.tagName === tag);
+                      return (
+                        <Badge
+                          key={tag}
+                          variant="secondary"
+                          className={`me-2 ${
+                            tagObj ? tagObj.backgroundColor : ""
+                          }`}
+                        >
+                          {tag}
+                        </Badge>
+                      );
+                    })}
                   </CardContent>
                 </Card>
               )
@@ -156,14 +228,33 @@ const App = () => {
         </div>
 
         {/* Done section */}
-        <div>
-          <h1 className="text-3xl font-bold">🌟✅Done</h1>
+        <div onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, "Done")}>
+          <h1 className="text-3xl font-bold">✅Done</h1>
           {displayItems.map(
             (singleItem, index) =>
               singleItem.selectedTaskType === "Done" && (
-                <Card className="w-full max-w-sm mt-4" key={index}>
+                <Card
+                  className="w-full max-w-sm mt-4 cursor-grab"
+                  key={index}
+                  draggable
+                  onDragStart={(e) => handleDragStart({ e, index })}
+                >
                   <CardContent>
                     <h2 className="text-xl">{singleItem?.inputFieldValue}</h2>
+                    {singleItem.activeTags.map((tag) => {
+                      const tagObj = tags.find((t) => t.tagName === tag);
+                      return (
+                        <Badge
+                          key={tag}
+                          variant="secondary"
+                          className={`me-2 ${
+                            tagObj ? tagObj.backgroundColor : ""
+                          }`}
+                        >
+                          {tag}
+                        </Badge>
+                      );
+                    })}
                   </CardContent>
                 </Card>
               )
